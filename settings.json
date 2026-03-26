@@ -1,3 +1,105 @@
 {
-    "symbols.hidesExplorerArrows": false
+  // Editor
+  "editor.fontSize": 14,
+  "editor.fontFamily": "'HackGen Console', Menlo, Monaco, 'Courier New', monospace",
+  "editor.renderWhitespace": "all",
+  "editor.stickyScroll.enabled": false,
+
+  // Diff Editor
+  "diffEditor.ignoreTrimWhitespace": false,
+  "diffEditor.renderSideBySide": true,
+
+  // Workbench
+  "workbench.colorTheme": "Dracula Theme",
+  "workbench.iconTheme": "symbols",
+  "workbench.editor.empty.hint": "hidden",
+  "workbench.editor.pinnedTabsOnSeparateRow": true,
+  "workbench.tree.enableStickyScroll": false,
+  "workbench.editor.pinnedTabSizing": "shrink",
+  "workbench.statusBar.visible": true,
+  "workbench.colorCustomizations": {
+    // Dracula Theme
+    "editorIndentGuide.background1": "#FF79C640",
+    "editorIndentGuide.background2": "#BD93F940",
+    "editorIndentGuide.background3": "#8BE9FD40",
+    "editorIndentGuide.background4": "#50FA7B40",
+    "editorIndentGuide.background5": "#F1FA8C40",
+    "editorIndentGuide.background6": "#FFB86C40",
+    "editorIndentGuide.activeBackground1": "#FF79C6",
+    "editorIndentGuide.activeBackground2": "#BD93F9",
+    "editorIndentGuide.activeBackground3": "#8BE9FD",
+    "editorIndentGuide.activeBackground4": "#50FA7B",
+    "editorIndentGuide.activeBackground5": "#F1FA8C",
+    "editorIndentGuide.activeBackground6": "#FFB86C"
+  },
+  // "workbench.colorCustomizations": {
+  //   // Monokai Theme
+  //   "editorIndentGuide.background1": "#FD971F40",
+  //   "editorIndentGuide.background2": "#E6DB7440",
+  //   "editorIndentGuide.background3": "#A6E22E40",
+  //   "editorIndentGuide.background4": "#66D9EF40",
+  //   "editorIndentGuide.background5": "#AE81FF40",
+  //   "editorIndentGuide.background6": "#F9267240",
+  //   "editorIndentGuide.activeBackground1": "#FD971F",
+  //   "editorIndentGuide.activeBackground2": "#E6DB74",
+  //   "editorIndentGuide.activeBackground3": "#A6E22E",
+  //   "editorIndentGuide.activeBackground4": "#66D9EF",
+  //   "editorIndentGuide.activeBackground5": "#AE81FF",
+  //   "editorIndentGuide.activeBackground6": "#F92672"
+  // },
+
+  // Indentation
+  "editor.tabSize": 4,
+
+  // Formatting
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+
+  // Git
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.blame.editorDecoration.enabled": false,
+
+  // ESLint
+  "eslint.format.enable": true,
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+
+  // Security
+  "security.promptForLocalFileProtocolHandling": false,
+
+  // Per language
+  "[typescript][typescriptreact][javascript][javascriptreact][html][css][json][jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[snippets]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[dockercompose]": {
+    "editor.insertSpaces": true,
+    "editor.autoIndent": "advanced",
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+
+  // TODO Tree
+  "todo-tree.highlights.defaultHighlight": {
+    "foreground": "#FFB86C"
+  },
+
+  // Redhat
+  "redhat.telemetry.enabled": false,
+
+  // Symbols
+  "symbols.hidesExplorerArrows": false
 }
