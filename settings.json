@@ -7,7 +7,7 @@
 
   // Diff Editor
   "diffEditor.ignoreTrimWhitespace": false,
-  "diffEditor.renderSideBySide": true,
+  "diffEditor.renderSideBySide": false,
 
   // Workbench
   "workbench.colorTheme": "Dracula Theme",
@@ -30,7 +30,7 @@
     "editorIndentGuide.activeBackground3": "#8BE9FD",
     "editorIndentGuide.activeBackground4": "#50FA7B",
     "editorIndentGuide.activeBackground5": "#F1FA8C",
-    "editorIndentGuide.activeBackground6": "#FFB86C"
+    "editorIndentGuide.activeBackground6": "#FFB86C",
   },
   // "workbench.colorCustomizations": {
   //   // Monokai Theme
@@ -55,7 +55,7 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll.eslint": "explicit",
   },
 
   // Git
@@ -69,7 +69,7 @@
     "javascript",
     "javascriptreact",
     "typescript",
-    "typescriptreact"
+    "typescriptreact",
   ],
 
   // Security
@@ -78,28 +78,28 @@
   // Per language
   "[typescript][typescriptreact][javascript][javascriptreact][html][css][json][jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2
+    "editor.tabSize": 2,
   },
   "[snippets]": {
-    "editor.defaultFormatter": "vscode.json-language-features"
+    "editor.defaultFormatter": "vscode.json-language-features",
   },
   "[dockercompose]": {
     "editor.insertSpaces": true,
     "editor.autoIndent": "advanced",
-    "editor.defaultFormatter": "redhat.vscode-yaml"
+    "editor.defaultFormatter": "redhat.vscode-yaml",
   },
   "[github-actions-workflow]": {
-    "editor.defaultFormatter": "redhat.vscode-yaml"
+    "editor.defaultFormatter": "redhat.vscode-yaml",
   },
 
   // TODO Tree
   "todo-tree.highlights.defaultHighlight": {
-    "foreground": "#FFB86C"
+    "foreground": "#FFB86C",
   },
 
   // Redhat
   "redhat.telemetry.enabled": false,
 
   // Symbols
-  "symbols.hidesExplorerArrows": false
+  "symbols.hidesExplorerArrows": false,
 }

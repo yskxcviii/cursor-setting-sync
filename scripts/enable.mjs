@@ -183,20 +183,21 @@ export function enableScheduledTask(nodePath, pullScript) {
 
   const escaped = (s) => s.replace(/'/g, "''");
   const psScript = [
+    `$ErrorActionPreference = 'Stop'`,
     `$action = New-ScheduledTaskAction -Execute '${escaped(
-      nodePath
+      nodePath,
     )}' -Argument '"${escaped(pullScript)}"'`,
     `$triggerLogon = New-ScheduledTaskTrigger -AtLogOn`,
     `$triggerRepeat = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Hours 1)`,
     `$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Minutes 5)`,
-    `Register-ScheduledTask -TaskName '${TASK_NAME}' -Action $action -Trigger @($triggerLogon, $triggerRepeat) -Settings $settings -Force`,
+    `Register-ScheduledTask -TaskName '${TASK_NAME}' -Action $action -Trigger @($triggerLogon, $triggerRepeat) -Settings $settings -Force -ErrorAction Stop`,
   ].join("\n");
 
   writeFileSync(psPath, psScript, "utf-8");
   try {
     execSync(
       `powershell -NoProfile -ExecutionPolicy Bypass -File "${psPath}"`,
-      { stdio: "inherit" }
+      { stdio: "inherit" },
     );
   } finally {
     // 成功・失敗に関わらず一時ファイルを削除する
@@ -208,6 +209,17 @@ export function enableScheduledTask(nodePath, pullScript) {
 // ---------------------------------------------------------------------------
 // メイン処理
 // ---------------------------------------------------------------------------
+
+/** execSync 失敗時は詳細が error.stderr に入ることがある ( message だけでは足りない ) */
+function execErrorText(error) {
+  const parts = [String(error?.message ?? "")];
+  for (const key of ["stderr", "stdout"]) {
+    const v = error?.[key];
+    if (v == null) continue;
+    parts.push(Buffer.isBuffer(v) ? v.toString("utf8") : String(v));
+  }
+  return parts.join("\n");
+}
 
 export function main() {
   try {
@@ -228,10 +240,30 @@ export function main() {
     // Windows でシンボリックリンク作成に失敗した場合は開発者モードの案内を表示
     if (process.platform === "win32" && error.message.includes("symlink")) {
       console.error(
-        "\nOn Windows, symlink creation may require Developer Mode to be enabled."
+        "\nOn Windows, symlink creation may require Developer Mode to be enabled.",
       );
       console.error(
-        "Settings > Update & Security > For developers > Developer Mode"
+        "Settings > Update & Security > For developers > Developer Mode",
+      );
+    }
+    // Windows でタスクスケジューラ登録が権限不足で失敗した場合
+    // ( message には Command failed: powershell ... しか無く、HRESULT は stderr 側のことが多い )
+    const msg = execErrorText(error);
+    const taskSetupScript = `${TASK_NAME}-setup.ps1`;
+    if (
+      process.platform === "win32" &&
+      (msg.includes("0x80070005") ||
+        /PermissionDenied|アクセスが拒否|Access is denied/i.test(msg) ||
+        msg.includes(taskSetupScript))
+    ) {
+      console.error(
+        "\nタスクスケジューラへの登録が権限不足で拒否されました。次のいずれかを試してください:",
+      );
+      console.error(
+        "  - 管理者としてターミナル (または PowerShell) を開き、 npm run sync:enable を実行する",
+      );
+      console.error(
+        "  - 管理者に、このアカウントでのタスク作成が許可されているか確認する",
       );
     }
     process.exit(1);

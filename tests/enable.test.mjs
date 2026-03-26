@@ -49,7 +49,7 @@ describe("scripts/enable.mjs", () => {
     mkdirSync(join(baseDir, "cursor-user"), { recursive: true });
     mkdirSync(join(baseDir, "repo"), { recursive: true });
     mkdirSync(tmpHome, { recursive: true });
-    writeFileSync(repoSettingsPath, "{\n  \"fromRepo\": true\n}\n", "utf-8");
+    writeFileSync(repoSettingsPath, '{\n  "fromRepo": true\n}\n', "utf-8");
 
     process.env.HOME = tmpHome;
     process.env.TEMP = join(baseDir, "tmp");
@@ -71,6 +71,14 @@ describe("scripts/enable.mjs", () => {
     vi.doMock("child_process", () => ({
       execSync: vi.fn(),
     }));
+
+    vi.doMock("os", async (importOriginal) => {
+      const orig = await importOriginal();
+      return {
+        ...orig,
+        homedir: () => tmpHome,
+      };
+    });
   });
 
   afterEach(() => {
@@ -86,17 +94,17 @@ describe("scripts/enable.mjs", () => {
   });
 
   it("backupSettings() copies existing settings.json into backup", async () => {
-    writeFileSync(settingsPath, "{\n  \"a\": 1\n}\n", "utf-8");
+    writeFileSync(settingsPath, '{\n  "a": 1\n}\n', "utf-8");
 
     const { backupSettings } = await import("../scripts/enable.mjs");
     backupSettings();
 
-    expect(readFileSync(backupPath, "utf-8")).toContain("\"a\": 1");
+    expect(readFileSync(backupPath, "utf-8")).toContain('"a": 1');
   });
 
   it("backupSettings() skips when settings.json is a symlink", async () => {
     // create a symlink at settingsPath
-    writeFileSync(join(baseDir, "real.json"), "{\n  \"x\": 1\n}\n", "utf-8");
+    writeFileSync(join(baseDir, "real.json"), '{\n  "x": 1\n}\n', "utf-8");
     // ensure parent exists
     // symlink target doesn't matter, just need isSymbolicLink() true
     const { symlinkSync } = await import("fs");
@@ -107,7 +115,7 @@ describe("scripts/enable.mjs", () => {
     backupSettings();
 
     expect(logSpy).toHaveBeenCalledWith(
-      "settings.json is already a symlink. Skipping backup."
+      "settings.json is already a symlink. Skipping backup.",
     );
     expect(existsSync(backupPath)).toBe(false);
   });
@@ -129,7 +137,7 @@ describe("scripts/enable.mjs", () => {
   });
 
   it("createSymlink() replaces existing regular file", async () => {
-    writeFileSync(settingsPath, "{\n  \"old\": true\n}\n", "utf-8");
+    writeFileSync(settingsPath, '{\n  "old": true\n}\n', "utf-8");
 
     const { createSymlink } = await import("../scripts/enable.mjs");
     createSymlink();
@@ -162,7 +170,7 @@ describe("scripts/enable.mjs", () => {
       tmpHome,
       "Library",
       "LaunchAgents",
-      "com.cursor-settings-sync.plist"
+      "com.cursor-settings-sync.plist",
     );
     expect(existsSync(plistPath)).toBe(true);
     const contents = readFileSync(plistPath, "utf-8");
@@ -193,32 +201,71 @@ describe("scripts/enable.mjs", () => {
     expect(execSync.mock.calls[0][0]).toContain("powershell");
   });
 
+  it("enableScheduledTask() writes ps1 with ErrorAction Stop for PowerShell", async () => {
+    setPlatform("win32");
+    const { enableScheduledTask } = await import("../scripts/enable.mjs");
+    const { execSync } = await import("child_process");
+    const tmpDir = process.env.TEMP;
+    const psPath = join(tmpDir, "CursorSettingsSync-setup.ps1");
+    let captured = "";
+    execSync.mockImplementation(() => {
+      if (existsSync(psPath)) {
+        captured = readFileSync(psPath, "utf-8");
+      }
+    });
+
+    const nodePath = "C:\\\\node\\\\node.exe";
+    const pullScript = "C:\\\\repo\\\\pull.mjs";
+    enableScheduledTask(nodePath, pullScript);
+
+    expect(captured).toContain("$ErrorActionPreference = 'Stop'");
+    expect(captured).toContain("-ErrorAction Stop");
+  });
+
+  it("enableScheduledTask() propagates when execSync fails", async () => {
+    setPlatform("win32");
+    const { enableScheduledTask } = await import("../scripts/enable.mjs");
+    const { execSync } = await import("child_process");
+    execSync.mockImplementation(() => {
+      throw new Error("Command failed with status 1");
+    });
+
+    expect(() =>
+      enableScheduledTask("C:\\\\node\\\\node.exe", "C:\\\\repo\\\\pull.mjs"),
+    ).toThrow("Command failed with status 1");
+  });
+
   it("enablePeriodicPull() dispatches by platform", async () => {
     const { enablePeriodicPull } = await import("../scripts/enable.mjs");
     const { execSync } = await import("child_process");
 
     setPlatform("darwin");
     enablePeriodicPull();
-    expect(execSync.mock.calls.map((c) => c[0]).some((c) => c.includes("launchctl load"))).toBe(true);
+    expect(
+      execSync.mock.calls
+        .map((c) => c[0])
+        .some((c) => c.includes("launchctl load")),
+    ).toBe(true);
 
     execSync.mockClear();
 
     setPlatform("win32");
     enablePeriodicPull();
-    expect(execSync.mock.calls.map((c) => c[0]).some((c) => c.includes("powershell"))).toBe(true);
+    expect(
+      execSync.mock.calls
+        .map((c) => c[0])
+        .some((c) => c.includes("powershell")),
+    ).toBe(true);
   });
 
   it("enablePeriodicPull() exits on unsupported platform", async () => {
     const { enablePeriodicPull } = await import("../scripts/enable.mjs");
-    const exitSpy = vi
-      .spyOn(process, "exit")
-      .mockImplementation(() => {
-        throw new Error("exit");
-      });
+    const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
+      throw new Error("exit");
+    });
 
     setPlatform("linux");
     expect(() => enablePeriodicPull()).toThrow("exit");
     expect(exitSpy).toHaveBeenCalledWith(1);
   });
 });
-

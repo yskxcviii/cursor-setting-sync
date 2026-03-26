@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { join } from "path";
 
 const originalPlatform = process.platform;
 const originalAppData = process.env.APPDATA;
@@ -34,7 +35,7 @@ describe("scripts/utils.mjs", () => {
     const { getSettingsDir } = await import("../scripts/utils.mjs");
 
     expect(getSettingsDir()).toMatch(
-      /Library\/Application Support\/Cursor\/User$/
+      /Library[\\/]Application Support[\\/]Cursor[\\/]User$/
     );
   });
 
@@ -43,7 +44,7 @@ describe("scripts/utils.mjs", () => {
     process.env.APPDATA = "/tmp/appdata";
     const { getSettingsDir } = await import("../scripts/utils.mjs");
 
-    expect(getSettingsDir()).toBe("/tmp/appdata/Cursor/User");
+    expect(getSettingsDir()).toBe(join("/tmp/appdata", "Cursor", "User"));
   });
 
   it("getSettingsDir() throws on unsupported platform", async () => {
@@ -63,13 +64,15 @@ describe("scripts/utils.mjs", () => {
       getLogPath,
     } = await import("../scripts/utils.mjs");
 
-    expect(getBackupDir()).toBe(`${REPO_ROOT}/original-settings`);
-    expect(getBackupPath()).toBe(`${REPO_ROOT}/original-settings/settings.json`);
-    expect(getRepoSettingsPath()).toBe(`${REPO_ROOT}/settings.json`);
-    expect(getLogPath()).toBe(`${REPO_ROOT}/logs/pull.log`);
+    expect(getBackupDir()).toBe(join(REPO_ROOT, "original-settings"));
+    expect(getBackupPath()).toBe(
+      join(REPO_ROOT, "original-settings", "settings.json")
+    );
+    expect(getRepoSettingsPath()).toBe(join(REPO_ROOT, "settings.json"));
+    expect(getLogPath()).toBe(join(REPO_ROOT, "logs", "pull.log"));
 
     setPlatform("darwin");
-    expect(getSettingsPath()).toMatch(/Cursor\/User\/settings\.json$/);
+    expect(getSettingsPath()).toMatch(/Cursor[\\/]User[\\/]settings\.json$/);
   });
 
   it("log() creates logs dir if missing and appends timestamped entry", async () => {

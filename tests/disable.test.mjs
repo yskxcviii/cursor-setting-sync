@@ -60,6 +60,14 @@ describe("scripts/disable.mjs", () => {
     vi.doMock("child_process", () => ({
       execSync: vi.fn(),
     }));
+
+    vi.doMock("os", async (importOriginal) => {
+      const orig = await importOriginal();
+      return {
+        ...orig,
+        homedir: () => tmpHome,
+      };
+    });
   });
 
   afterEach(() => {
