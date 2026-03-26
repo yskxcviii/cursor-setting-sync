@@ -177,7 +177,8 @@ describe("scripts/enable.mjs", () => {
     expect(contents).toContain("<string>com.cursor-settings-sync</string>");
     expect(contents).toContain(`<string>${nodePath}</string>`);
     expect(contents).toContain(`<string>${pullScript}</string>`);
-    expect(contents).toContain("<integer>3600</integer>");
+    expect(contents).toContain("<key>Minute</key>");
+    expect(contents).toContain("<integer>0</integer>");
 
     expect(execSync).toHaveBeenCalled();
     const calls = execSync.mock.calls.map((c) => c[0]);
@@ -201,7 +202,7 @@ describe("scripts/enable.mjs", () => {
     expect(execSync.mock.calls[0][0]).toContain("powershell");
   });
 
-  it("enableScheduledTask() writes ps1 with ErrorAction Stop for PowerShell", async () => {
+  it("enableScheduledTask() writes ps1 with direct node action", async () => {
     setPlatform("win32");
     const { enableScheduledTask } = await import("../scripts/enable.mjs");
     const { execSync } = await import("child_process");
@@ -219,7 +220,13 @@ describe("scripts/enable.mjs", () => {
     enableScheduledTask(nodePath, pullScript);
 
     expect(captured).toContain("$ErrorActionPreference = 'Stop'");
-    expect(captured).toContain("-ErrorAction Stop");
+    expect(captured).toContain("run-hidden.vbs");
+    expect(captured).toContain(
+      "$wscriptPath = Join-Path $env:WINDIR 'System32\\wscript.exe'",
+    );
+    expect(captured).toContain(
+      '$action = New-ScheduledTaskAction -Execute $wscriptPath -Argument $arg',
+    );
   });
 
   it("enableScheduledTask() propagates when execSync fails", async () => {

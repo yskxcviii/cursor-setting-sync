@@ -176,6 +176,9 @@ export function enableLaunchAgent(nodePath, pullScript) {
  * schtasks では複数トリガーを1回で登録できないため、
  * 一時的な .ps1 ファイルを書き出して PowerShell で実行する。
  *
+ * 実行時のウィンドウ表示を避けるため、
+ * タスク本体は wscript.exe + VBScript ラッパー経由で node を起動する。
+ *
  * 登録されるトリガー:
  *   - AtLogOn: ユーザーログイン時に自動実行
  *   - RepetitionInterval 1h: 次の正時 (分=0 秒=0) を起点に、以降1時間ごとに繰り返し
@@ -185,16 +188,17 @@ export function enableLaunchAgent(nodePath, pullScript) {
 export function enableScheduledTask(nodePath, pullScript) {
   const tmpDir = process.env.TEMP || process.env.TMP || ".";
   const psPath = join(tmpDir, `${TASK_NAME}-setup.ps1`);
+  const vbsPath = join(REPO_ROOT, "scripts", "run-hidden.vbs");
 
   const escaped = (s) => s.replace(/'/g, "''");
   const psScript = [
     `$ErrorActionPreference = 'Stop'`,
     `$nodePath = '${escaped(nodePath)}'`,
     `$pullScript = '${escaped(pullScript)}'`,
-    `$cmd = "Start-Process -FilePath '$nodePath' -ArgumentList @('$pullScript') -WindowStyle Hidden -Wait | Out-Null"`,
-    `$bytes = [System.Text.Encoding]::Unicode.GetBytes($cmd)`,
-    `$encoded = [Convert]::ToBase64String($bytes)`,
-    `$action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument "-NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -EncodedCommand $encoded"`,
+    `$vbsPath = '${escaped(vbsPath)}'`,
+    `$wscriptPath = Join-Path $env:WINDIR 'System32\\wscript.exe'`,
+    `$arg = "//B //NoLogo ""$vbsPath"" ""$nodePath"" ""$pullScript"""`,
+    `$action = New-ScheduledTaskAction -Execute $wscriptPath -Argument $arg`,
     `$triggerLogon = New-ScheduledTaskTrigger -AtLogOn`,
     `$now = Get-Date`,
     `$nextHour = $now.AddHours(1)`,
