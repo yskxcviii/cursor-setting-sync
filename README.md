@@ -20,7 +20,7 @@ Cursor の `settings.json` を複数デバイス間で同期するためのユ�
 
 ```bash
 git clone --fork <repository-url>
-cd cursor-settings
+cd cursor-setting-sync
 npm i
 ```
 
