@@ -1,0 +1,14 @@
+{
+  "name": "cursor-settings",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "sync:enable": "node scripts/enable.mjs",
+    "sync:disable": "node scripts/disable.mjs",
+    "pull": "node scripts/pull.mjs",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.1"
+  }
+}
