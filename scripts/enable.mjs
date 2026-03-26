@@ -99,7 +99,7 @@ export function createSymlink() {
 
 /**
  * OS に応じた定期実行の仕組みを登録する。
- * どちらの OS でもログイン時に自動起動し、1時間ごとに pull を繰り返す。
+ * どちらの OS でもログイン時に自動起動し、毎時 00 分に pull を繰り返す。
  */
 export function enablePeriodicPull() {
   const nodePath = process.execPath;
@@ -118,7 +118,7 @@ export function enablePeriodicPull() {
 /**
  * Mac: ~/Library/LaunchAgents/ に plist を作成し launchctl で登録する。
  * - RunAtLoad: ログイン時に即座に1回実行
- * - StartInterval: 以降 3600 秒 (1時間) ごとに繰り返し実行
+ * - StartCalendarInterval: 以降、毎時 00 分に繰り返し実行
  * - stdout/stderr は /dev/null に捨てる (ログは pull.mjs 側で logs/pull.log に記録)
  */
 export function enableLaunchAgent(nodePath, pullScript) {
@@ -137,8 +137,13 @@ export function enableLaunchAgent(nodePath, pullScript) {
           <string>${nodePath}</string>
           <string>${pullScript}</string>
         </array>
-        <key>StartInterval</key>
-        <integer>3600</integer>
+        <key>StartCalendarInterval</key>
+        <array>
+          <dict>
+            <key>Minute</key>
+            <integer>0</integer>
+          </dict>
+        </array>
         <key>RunAtLoad</key>
         <true/>
         <key>StandardOutPath</key>
@@ -173,7 +178,7 @@ export function enableLaunchAgent(nodePath, pullScript) {
  *
  * 登録されるトリガー:
  *   - AtLogOn: ユーザーログイン時に自動実行
- *   - RepetitionInterval 1h: 以降1時間ごとに繰り返し
+ *   - RepetitionInterval 1h: 次の正時 (分=0 秒=0) を起点に、以降1時間ごとに繰り返し
  *
  * バッテリー駆動時やスリープ復帰後にも動作するよう設定する。
  */
@@ -184,11 +189,17 @@ export function enableScheduledTask(nodePath, pullScript) {
   const escaped = (s) => s.replace(/'/g, "''");
   const psScript = [
     `$ErrorActionPreference = 'Stop'`,
-    `$action = New-ScheduledTaskAction -Execute '${escaped(
-      nodePath,
-    )}' -Argument '"${escaped(pullScript)}"'`,
+    `$nodePath = '${escaped(nodePath)}'`,
+    `$pullScript = '${escaped(pullScript)}'`,
+    `$cmd = "Start-Process -FilePath '$nodePath' -ArgumentList @('$pullScript') -WindowStyle Hidden -Wait | Out-Null"`,
+    `$bytes = [System.Text.Encoding]::Unicode.GetBytes($cmd)`,
+    `$encoded = [Convert]::ToBase64String($bytes)`,
+    `$action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument "-NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -EncodedCommand $encoded"`,
     `$triggerLogon = New-ScheduledTaskTrigger -AtLogOn`,
-    `$triggerRepeat = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Hours 1)`,
+    `$now = Get-Date`,
+    `$nextHour = $now.AddHours(1)`,
+    `$nextHour = [datetime]::new($nextHour.Year, $nextHour.Month, $nextHour.Day, $nextHour.Hour, 0, 0)`,
+    `$triggerRepeat = New-ScheduledTaskTrigger -Once -At $nextHour -RepetitionInterval (New-TimeSpan -Hours 1)`,
     `$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Minutes 5)`,
     `Register-ScheduledTask -TaskName '${TASK_NAME}' -Action $action -Trigger @($triggerLogon, $triggerRepeat) -Settings $settings -Force -ErrorAction Stop`,
   ].join("\n");
