@@ -21,7 +21,6 @@ Cursor の `settings.json` を複数デバイス間で同期するためのユ�
 ```bash
 git clone --fork https://github.com/yskxcviii/cursor-setting-sync.git
 cd cursor-setting-sync
-npm i
 ```
 
 ## 使い方
