@@ -1,6 +1,6 @@
 {
   // Editor
-  "editor.fontSize": 14,
+  "editor.fontSize": 12,
   "editor.fontFamily": "'HackGen Console', Menlo, Monaco, 'Courier New', monospace",
   "editor.renderWhitespace": "all",
   "editor.stickyScroll.enabled": false,
@@ -19,35 +19,49 @@
   "workbench.editor.pinnedTabSizing": "shrink",
   "workbench.statusBar.visible": true,
   "workbench.colorCustomizations": {
-    // Dracula Theme
-    "editorIndentGuide.background1": "#FF79C640",
-    "editorIndentGuide.background2": "#BD93F940",
-    "editorIndentGuide.background3": "#8BE9FD40",
-    "editorIndentGuide.background4": "#50FA7B40",
-    "editorIndentGuide.background5": "#F1FA8C40",
-    "editorIndentGuide.background6": "#FFB86C40",
-    "editorIndentGuide.activeBackground1": "#FF79C6",
-    "editorIndentGuide.activeBackground2": "#BD93F9",
-    "editorIndentGuide.activeBackground3": "#8BE9FD",
-    "editorIndentGuide.activeBackground4": "#50FA7B",
-    "editorIndentGuide.activeBackground5": "#F1FA8C",
-    "editorIndentGuide.activeBackground6": "#FFB86C"
+    "[Dracula Theme]": {
+      "editorIndentGuide.background1": "#FF79C640",
+      "editorIndentGuide.background2": "#BD93F940",
+      "editorIndentGuide.background3": "#8BE9FD40",
+      "editorIndentGuide.background4": "#50FA7B40",
+      "editorIndentGuide.background5": "#F1FA8C40",
+      "editorIndentGuide.background6": "#FFB86C40",
+      "editorIndentGuide.activeBackground1": "#FF79C6",
+      "editorIndentGuide.activeBackground2": "#BD93F9",
+      "editorIndentGuide.activeBackground3": "#8BE9FD",
+      "editorIndentGuide.activeBackground4": "#50FA7B",
+      "editorIndentGuide.activeBackground5": "#F1FA8C",
+      "editorIndentGuide.activeBackground6": "#FFB86C"
+    },
+    "[Monokai]": {
+      "editorIndentGuide.background1": "#FD971F40",
+      "editorIndentGuide.background2": "#E6DB7440",
+      "editorIndentGuide.background3": "#A6E22E40",
+      "editorIndentGuide.background4": "#66D9EF40",
+      "editorIndentGuide.background5": "#AE81FF40",
+      "editorIndentGuide.background6": "#F9267240",
+      "editorIndentGuide.activeBackground1": "#FD971F",
+      "editorIndentGuide.activeBackground2": "#E6DB74",
+      "editorIndentGuide.activeBackground3": "#A6E22E",
+      "editorIndentGuide.activeBackground4": "#66D9EF",
+      "editorIndentGuide.activeBackground5": "#AE81FF",
+      "editorIndentGuide.activeBackground6": "#F92672"
+    },
+    "[Mayukai Alucard]": {
+      "editorIndentGuide.background1": "#FFCC6640",
+      "editorIndentGuide.background2": "#FFB45440",
+      "editorIndentGuide.background3": "#95FB7940",
+      "editorIndentGuide.background4": "#9FE7FA40",
+      "editorIndentGuide.background5": "#D693F840",
+      "editorIndentGuide.background6": "#EE68AF40",
+      "editorIndentGuide.activeBackground1": "#FFCC66",
+      "editorIndentGuide.activeBackground2": "#FFB454",
+      "editorIndentGuide.activeBackground3": "#95FB79",
+      "editorIndentGuide.activeBackground4": "#9FE7FA",
+      "editorIndentGuide.activeBackground5": "#D693F8",
+      "editorIndentGuide.activeBackground6": "#EE68AF"
+    }
   },
-  // "workbench.colorCustomizations": {
-  //   // Monokai Theme
-  //   "editorIndentGuide.background1": "#FD971F40",
-  //   "editorIndentGuide.background2": "#E6DB7440",
-  //   "editorIndentGuide.background3": "#A6E22E40",
-  //   "editorIndentGuide.background4": "#66D9EF40",
-  //   "editorIndentGuide.background5": "#AE81FF40",
-  //   "editorIndentGuide.background6": "#F9267240",
-  //   "editorIndentGuide.activeBackground1": "#FD971F",
-  //   "editorIndentGuide.activeBackground2": "#E6DB74",
-  //   "editorIndentGuide.activeBackground3": "#A6E22E",
-  //   "editorIndentGuide.activeBackground4": "#66D9EF",
-  //   "editorIndentGuide.activeBackground5": "#AE81FF",
-  //   "editorIndentGuide.activeBackground6": "#F92672"
-  // },
 
   // Indentation
   "editor.tabSize": 4,
